@@ -9,7 +9,7 @@ import kit
 C = importlib.reload(C)  # Streamlit Cloud keeps old copies of imported files after an update; always use the latest
 kit = importlib.reload(kit)
 
-kit.page("AI Cost Check", "What an AI task really costs to run each month, and what it saves", mark="💶",
+kit.page("AI Cost Check", "What an AI task really costs to run each month, and what it saves", mark="calculator", icon="💶",
          meta=f"Model prices checked {C.PRICES_CHECKED} · nothing you type is stored", badge="Free · no sign-up")
 
 
@@ -29,7 +29,7 @@ def months(x):
 layout = st.container(key="answer_first")  # on phones the answer column moves above the questions
 left, right = layout.columns([5, 7], gap="large")
 
-with left:
+with left.container(border=True):
     st.markdown("#### The task")
     key = st.selectbox("What should the AI do?", list(C.TASKS), format_func=lambda k: C.TASKS[k][0])
     label, unit, vol0, tin0, tout0, min0, tier0, note = C.TASKS[key]
@@ -85,8 +85,9 @@ with right:
     with st.expander("Prices and where they come from"):
         st.markdown(f"Standard published rates per million tokens, checked **{C.PRICES_CHECKED}**, without batch or "
                     "cache discounts (both cut costs further).")
-        st.dataframe([{"Model": n, "Provider": p, "In, $/1M": pi, "Out, $/1M": po, "Note": nt}
-                      for n, p, t, pi, po, nt, s in C.MODELS], hide_index=True, width="stretch")
+        kit.table([{"m": n, "p": p, "i": f"${pi:.2f}", "o": f"${po:.2f}", "n": nt or "—"} for n, p, t, pi, po, nt, s in C.MODELS],
+                  [kit.col("Model", "m", "strong"), kit.col("Provider", "p", "chip", {"Anthropic": "warn", "Google": "info", "OpenAI": ""}),
+                   kit.col("In, per 1M tokens", "i", "num"), kit.col("Out, per 1M tokens", "o", "num"), kit.col("Note", "n", "muted")])
         st.markdown(" · ".join(f"[{p} prices]({s})" for p, s in
                                dict((p, s) for n, p, t, pi, po, nt, s in C.MODELS).items()))
 
