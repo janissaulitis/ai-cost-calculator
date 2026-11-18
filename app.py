@@ -12,18 +12,6 @@ kit = importlib.reload(kit)
 kit.page("AI Cost Check", "What an AI task really costs to run each month, and what it saves", mark="💶",
          meta=f"Model prices checked {C.PRICES_CHECKED} · nothing you type is stored", badge="Free · no sign-up")
 
-st.markdown("""<style>
-.bars { display: grid; gap: 7px; margin: 4px 0 8px; }
-.bar { display: grid; grid-template-columns: minmax(130px, 34%) 1fr 84px; align-items: center; gap: 10px; font-size: 14px; }
-.bar span { color: var(--k-ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.bar span small { color: var(--k-muted); }
-.bar div { height: 12px; background: var(--k-line); border-radius: 6px; overflow: hidden; }
-.bar i { display: block; height: 100%; min-width: 3px; background: var(--k-go); border-radius: 6px; }
-.bar b { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; color: var(--k-ink); }
-.bar.weak span, .bar.weak b { color: var(--k-muted); font-weight: 400; }
-.bar.weak i { background: var(--k-muted); opacity: .45; }
-.bar.pick span { font-weight: 600; }
-</style>""", unsafe_allow_html=True)
 
 
 def eur(x):
@@ -38,7 +26,8 @@ def months(x):
     return "under a month" if x < 1 else f"{x:.0f} month{'s' if round(x) != 1 else ''}"
 
 
-left, right = st.columns([5, 7], gap="large")
+layout = st.container(key="answer_first")  # on phones the answer column moves above the questions
+left, right = layout.columns([5, 7], gap="large")
 
 with left:
     st.markdown("#### The task")
@@ -70,32 +59,25 @@ r = C.compare(volume, tin, tout, minutes, hourly, automated, tier, fx, review, p
 pick = r["pick"]
 
 with right:
-    with st.container(border=True):
-        if r["net"] > 0:
-            st.markdown(f"### Saves about {eur(r['net'])} a month after every cost")
-            st.markdown(f"Setup pays back in **{months(r['payback'])}**. The AI itself costs "
-                        f"**{eur(pick['cost'])} a month** on {pick['model']}"
-                        + (f", under 1% of what it costs to run." if r["ai_share"] < 0.01
-                           else f", {r['ai_share']:.0%} of what it costs to run.")
-                        + (" Most of the cost is people checking its work." if r["review"] > r["platform"] + pick["cost"]
-                           else ""))
-        else:
-            st.markdown(f"### Costs {eur(-r['net'])} a month more than it saves")
-            st.markdown("At this volume, checking the AI's work and running the tools cost more than the time it frees. "
-                        "It starts to pay with more volume, less checking per item, or a task that takes longer by hand.")
-        m = st.columns(4)
-        m[0].metric("Time freed", f"{r['saved_hours']:,.0f} h", help=f"Worth {eur(r['saved'])} a month")
-        m[1].metric("Checking", eur(r["review"]), help="Staff time spent reviewing AI results, in €")
-        m[2].metric("AI bill", eur(pick["cost"]), help=f"{pick['model']}, {eur(pick['per_item'] * 1000)} per 1,000 items")
-        m[3].metric("Tools", eur(r["platform"]))
+    tiles = [("Time freed", f"{r['saved_hours']:,.0f} h"), ("Checking", eur(r["review"])),
+             ("AI bill", eur(pick["cost"])), ("Tools", eur(r["platform"]))]
+    if r["net"] > 0:
+        kit.answer("Worth doing", f"You save about {eur(r['net'])} a month after every cost",
+                   f"Setup pays back in <b>{months(r['payback'])}</b>. The AI itself costs <b>{eur(pick['cost'])} a month</b> "
+                   f"on {pick['model']}"
+                   + (", under 1% of what it costs to run." if r["ai_share"] < 0.01
+                      else f", {r['ai_share']:.0%} of what it costs to run.")
+                   + (" Most of the cost is people checking its work." if r["review"] > r["platform"] + pick["cost"] else ""),
+                   tiles)
+    else:
+        kit.answer("Not worth it yet", f"Costs {eur(-r['net'])} a month more than it saves",
+                   "At this volume, checking the AI's work and running the tools cost more than the time it frees. "
+                   "It starts to pay with more volume, less checking per item, or a task that takes longer by hand.",
+                   tiles, tone="warn")
 
     st.markdown(f"#### The same {volume:,} {unit} on every model")
-    top = max(x["cost"] for x in r["rows"]) or 1
-    st.markdown("<div class='bars'>" + "".join(
-        f"<div class='bar{' pick' if x is pick else ''}{'' if x['suited'] else ' weak'}'>"
-        f"<span>{x['model']}{' <small>· may be too weak</small>' if not x['suited'] else ''}</span>"
-        f"<div><i style='width:{x['cost'] / top * 100:.1f}%'></i></div><b>{eur(x['cost'])}</b></div>"
-        for x in r["rows"]) + "</div>", unsafe_allow_html=True)
+    kit.bars([{"label": x["model"], "value": x["cost"], "text": eur(x["cost"]), "pick": x is pick,
+               "dim": not x["suited"], "note": None if x["suited"] else "may be too weak"} for x in r["rows"]])
     dearest = max(x["cost"] for x in r["rows"] if x["suited"])
     st.caption(f"A month on the dearest suitable model is {eur(dearest)}, against {eur(r['saved'])} of staff time freed. "
                "Picking the model matters less than how much checking the work needs.")
