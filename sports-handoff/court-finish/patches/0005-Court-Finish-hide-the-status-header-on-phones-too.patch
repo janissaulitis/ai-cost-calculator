@@ -1,0 +1,27 @@
+From 1432c6737050c3b2800452adb718208072d625be Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Thu, 19 Nov 2026 10:42:44 +0200
+Subject: [PATCH 5/5] Court Finish: hide the status header on phones too
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01Lpcb7tW7qJ2rddbPY9PtGK
+---
+ app.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/app.py b/app.py
+index 172a1e0..b449348 100644
+--- a/app.py
++++ b/app.py
+@@ -704,7 +704,7 @@ with hero:
+            f'<div style="color:#7FD18B">NO OVERTIME LIKELY · {overtime_chance}% CHANCE</div>')
+         + '</div></div>'
+         f'<div style="margin-top:20px"><div class="k-dep h"><div>MATCH</div><div>LIKELY START</div><div class="nb">NOT BEFORE</div>'
+-        f'<div>FINISH</div><div>STATUS</div></div>' + "".join(rows_html) + "</div>"
++        f'<div>FINISH</div><div class="st">STATUS</div></div>' + "".join(rows_html) + "</div>"
+         f'<div class="k-board-f"><span>Crew shift ends {shift_end.strftime("%H:%M")} · {SIMULATIONS:,} simulated court days from real ATP Challenger matches</span>'
+         f'<span style="color:#FFB000">Edit the order of play below ↓</span></div></div>', unsafe_allow_html=True)
+ 
+-- 
+2.43.0
+
