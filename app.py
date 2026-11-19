@@ -1,5 +1,5 @@
-import os
 """AI Cost Check: what an AI task really costs to run, and what it saves. Run: streamlit run app.py"""
+import os
 import importlib
 
 import streamlit as st
