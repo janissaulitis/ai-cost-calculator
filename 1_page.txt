@@ -1,0 +1,78 @@
+AI Cost Check
+
+What an AI task really costs to run each month, and what it saves
+Free · no sign-up
+Model prices checked 13 Nov 2026 · nothing you type is stored
+
+▶ 1-min demo
+
+How it works
+
+expand_more
+The task
+
+What should the AI do?
+
+How many emails a month?
+
+Minutes a person spends on one today
+
+Cost of one hour of staff time, €
+
+Share of the work the AI takes over
+
+0.60
+
+0.10
+
+1.00
+
+Minutes a person spends checking each AI result
+
+keyboard_arrow_right
+
+Setup, tools and token sizes
+
+WORTH DOING
+
+You keep about €670 a month
+
+Setup pays back in 4 months. The AI itself costs €0.47 a month on Claude Haiku 5.5, under 1% of what it costs to run. Most of the cost is people checking its work.
+Where the staff time it frees goes
+€900 a month · 60 h
+You keep
+€670
+People checking
+€200
+Hosting and tools
+€30
+The AI itself
+€0.47
+The same 2,000 emails a month on every model
+Claude Haiku 5.5
+€0.47
+GPT-5.4 nano
+€1
+Gemini 3.5 Flash-Lite
+€2
+Gemini 3.8 Flash
+€4
+GPT-5.4 mini
+€4
+Claude Sonnet 5.5
+€9
+Gemini 4 Argon
+€9
+Claude Opus 5.5
+€19
+GPT-6 Astra
+€47
+
+A month on the dearest suitable model is €47, against €900 of staff time freed. Picking the model matters less than how much checking the work needs.
+
+keyboard_arrow_right
+
+Prices and where they come from
+
+Built by Jānis Saulītis with AI · costs.py · prices checked 13 Nov 2026
+See more tools
