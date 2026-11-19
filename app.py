@@ -10,7 +10,7 @@ C = importlib.reload(C)  # Streamlit Cloud keeps old copies of imported files af
 kit = importlib.reload(kit)
 
 kit.page("AI Cost Check", "What an AI task really costs to run each month, and what it saves", mark="calculator", icon="💶",
-         meta=f"Model prices checked {C.PRICES_CHECKED} · nothing you type is stored", badge="Free · no sign-up")
+         meta=f"Model prices checked {C.PRICES_CHECKED} · nothing you type is stored", badge="Free · no sign-up", theme="field")
 
 
 
@@ -56,13 +56,25 @@ with left.container(border=True):
         st.caption(f"{note} One token is about ¾ of an English word; Latvian uses more.")
 
 r = C.compare(volume, tin, tout, minutes, hourly, automated, tier, fx, review, platform, setup)
+
+
+def knob(label, value, lo, hi, text):
+    import math
+    f = 0 if hi == lo else max(0.0, min(1.0, (value - lo) / (hi - lo)))
+    ang = math.radians(-135 + 270 * f)
+    x, y = 32 + 20 * math.sin(ang), 32 - 20 * math.cos(ang)
+    return (f'<div class="k-knob"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="27" fill="var(--k-surface)" stroke="var(--k-ink)" stroke-width="2.5"/>'
+            f'<circle cx="32" cy="32" r="21" fill="none" stroke="var(--k-line)" stroke-width="1.5" stroke-dasharray="2 4"/>'
+            f'<line x1="32" y1="32" x2="{x:.1f}" y2="{y:.1f}" stroke="var(--k-go)" stroke-width="4" stroke-linecap="round"/></svg>'
+            f'<span>{label}</span><b>{text}</b></div>')
+
 pick = r["pick"]
 
 with right:
     tiles = [("Time freed", f"{r['saved_hours']:,.0f} h"), ("Checking", eur(r["review"])),
              ("AI bill", eur(pick["cost"])), ("Tools", eur(r["platform"]))]
     if r["net"] > 0:
-        kit.answer("Worth doing", f"You save about {eur(r['net'])} a month after every cost",
+        kit.answer("Worth doing · you save", f"{eur(r['net'])} / mo",
                    f"Setup pays back in <b>{months(r['payback'])}</b>. The AI itself costs <b>{eur(pick['cost'])} a month</b> "
                    f"on {pick['model']}"
                    + (", under 1% of what it costs to run." if r["ai_share"] < 0.01
@@ -70,11 +82,15 @@ with right:
                    + (" Most of the cost is people checking its work." if r["review"] > r["platform"] + pick["cost"] else ""),
                    tiles)
     else:
-        kit.answer("Not worth it yet", f"Costs {eur(-r['net'])} a month more than it saves",
+        kit.answer("Not worth it yet · it costs", f"−{eur(-r['net'])} / mo",
                    "At this volume, checking the AI's work and running the tools cost more than the time it frees. "
                    "It starts to pay with more volume, less checking per item, or a task that takes longer by hand.",
                    tiles, tone="warn")
 
+    st.markdown('<div class="k-knobs">' + knob(unit.split(" ")[0] + " / mo", volume, 0, max(5000, vol0 * 2), f"{volume:,}")
+            + knob("min each", minutes, 0, 30, f"{minutes:g}") + knob("€ / hour", hourly, 5, 60, f"{hourly:g}")
+            + knob("AI share", automated, 0, 1, f"{automated:.2f}") + knob("check min", review, 0, 5, f"{review:g}")
+            + "</div>", unsafe_allow_html=True)
     st.markdown(f"#### The same {volume:,} {unit} on every model")
     kit.bars([{"label": x["model"], "value": x["cost"], "text": eur(x["cost"]), "pick": x is pick,
                "dim": not x["suited"], "note": None if x["suited"] else "may be too weak"} for x in r["rows"]])
