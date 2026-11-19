@@ -1,3 +1,4 @@
+import os
 """AI Cost Check: what an AI task really costs to run, and what it saves. Run: streamlit run app.py"""
 import importlib
 
@@ -11,6 +12,9 @@ kit = importlib.reload(kit)
 
 kit.page("AI Cost Check", "What an AI task really costs to run each month, and what it saves", mark="calculator", icon="💶",
          meta=f"Model prices checked {C.PRICES_CHECKED} · nothing you type is stored", badge="Free · no sign-up", theme="ledger")
+
+kit.demo(os.environ.get("DEMO_VIDEO", "https://janis-saulitis-portfolio.netlify.app/media/cost.mp4"), "AI Cost Check in 1 minute",
+         "1. Pick the **task** the AI should do and how many a month.\n2. Say how long a person takes today and what an hour of staff time costs.\n3. Read what you keep each month and when setup pays back.\n4. Compare the same work on nine current models.")
 
 
 
