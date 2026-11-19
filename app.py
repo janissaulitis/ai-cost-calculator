@@ -87,6 +87,7 @@ with right:
                    "It starts to pay with more volume, less checking per item, or a task that takes longer by hand.",
                    tiles, tone="warn")
 
+    st.caption("Your settings at a glance")
     st.markdown('<div class="k-knobs">' + knob(unit.split(" ")[0] + " / mo", volume, 0, max(5000, vol0 * 2), f"{volume:,}")
             + knob("min each", minutes, 0, 30, f"{minutes:g}") + knob("€ / hour", hourly, 5, 60, f"{hourly:g}")
             + knob("AI share", automated, 0, 1, f"{automated:.2f}") + knob("check min", review, 0, 5, f"{review:g}")
