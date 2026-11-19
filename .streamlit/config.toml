@@ -1,19 +1,19 @@
 [theme]
-font = "Archivo:https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap, sans-serif"
-headingFont = "Archivo:https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap, sans-serif"
+font = "Inter Tight:https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap, sans-serif"
+headingFont = "Inter Tight:https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap, sans-serif"
 baseFontWeight = 500
-baseRadius = "0.5rem"
-buttonRadius = "0.5rem"
+baseRadius = "0.6rem"
+buttonRadius = "0.6rem"
 showWidgetBorder = true
 
 [theme.light]
-primaryColor = "#C24400"
-backgroundColor = "#E6E6E3"
-secondaryBackgroundColor = "#F5F5F2"
-textColor = "#111111"
+primaryColor = "#0F766E"
+backgroundColor = "#F4F6F8"
+secondaryBackgroundColor = "#FFFFFF"
+textColor = "#0E1A2B"
 
 [theme.dark]
-primaryColor = "#FF6A13"
-backgroundColor = "#121212"
-secondaryBackgroundColor = "#1D1D1C"
-textColor = "#ECECE8"
+primaryColor = "#2DD4BF"
+backgroundColor = "#0B1220"
+secondaryBackgroundColor = "#121B2B"
+textColor = "#E6ECF3"

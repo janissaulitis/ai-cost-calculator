@@ -10,7 +10,7 @@ C = importlib.reload(C)  # Streamlit Cloud keeps old copies of imported files af
 kit = importlib.reload(kit)
 
 kit.page("AI Cost Check", "What an AI task really costs to run each month, and what it saves", mark="calculator", icon="💶",
-         meta=f"Model prices checked {C.PRICES_CHECKED} · nothing you type is stored", badge="Free · no sign-up", theme="field")
+         meta=f"Model prices checked {C.PRICES_CHECKED} · nothing you type is stored", badge="Free · no sign-up", theme="ledger")
 
 
 
@@ -58,23 +58,13 @@ with left.container(border=True):
 r = C.compare(volume, tin, tout, minutes, hourly, automated, tier, fx, review, platform, setup)
 
 
-def knob(label, value, lo, hi, text):
-    import math
-    f = 0 if hi == lo else max(0.0, min(1.0, (value - lo) / (hi - lo)))
-    ang = math.radians(-135 + 270 * f)
-    x, y = 32 + 20 * math.sin(ang), 32 - 20 * math.cos(ang)
-    return (f'<div class="k-knob"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="27" fill="var(--k-surface)" stroke="var(--k-ink)" stroke-width="2.5"/>'
-            f'<circle cx="32" cy="32" r="21" fill="none" stroke="var(--k-line)" stroke-width="1.5" stroke-dasharray="2 4"/>'
-            f'<line x1="32" y1="32" x2="{x:.1f}" y2="{y:.1f}" stroke="var(--k-go)" stroke-width="4" stroke-linecap="round"/></svg>'
-            f'<span>{label}</span><b>{text}</b></div>')
-
 pick = r["pick"]
 
 with right:
     tiles = [("Time freed", f"{r['saved_hours']:,.0f} h"), ("Checking", eur(r["review"])),
              ("AI bill", eur(pick["cost"])), ("Tools", eur(r["platform"]))]
     if r["net"] > 0:
-        kit.answer("Worth doing · you save", f"{eur(r['net'])} / mo",
+        kit.answer("Worth doing", f"You keep about {eur(r['net'])} a month",
                    f"Setup pays back in <b>{months(r['payback'])}</b>. The AI itself costs <b>{eur(pick['cost'])} a month</b> "
                    f"on {pick['model']}"
                    + (", under 1% of what it costs to run." if r["ai_share"] < 0.01
@@ -82,16 +72,22 @@ with right:
                    + (" Most of the cost is people checking its work." if r["review"] > r["platform"] + pick["cost"] else ""),
                    tiles)
     else:
-        kit.answer("Not worth it yet · it costs", f"−{eur(-r['net'])} / mo",
+        kit.answer("Not worth it yet", f"It costs {eur(-r['net'])} a month more than it saves",
                    "At this volume, checking the AI's work and running the tools cost more than the time it frees. "
                    "It starts to pay with more volume, less checking per item, or a task that takes longer by hand.",
                    tiles, tone="warn")
 
-    st.caption("Your settings at a glance")
-    st.markdown('<div class="k-knobs">' + knob(unit.split(" ")[0] + " / mo", volume, 0, max(5000, vol0 * 2), f"{volume:,}")
-            + knob("min each", minutes, 0, 30, f"{minutes:g}") + knob("€ / hour", hourly, 5, 60, f"{hourly:g}")
-            + knob("AI share", automated, 0, 1, f"{automated:.2f}") + knob("check min", review, 0, 5, f"{review:g}")
-            + "</div>", unsafe_allow_html=True)
+    top = max(r["saved"], r["running"], 1)
+    steps, left = [], r["saved"]
+    rows = [("gain", "Staff time freed", 0, r["saved"], f"+{eur(r['saved'])}")]
+    for cls, name, val in [("cost", "People checking", r["review"]), ("cost", "Hosting and tools", r["platform"]), ("ai", "AI bill", pick["cost"])]:
+        rows.append((cls, name, max(left - val, 0), left, f"−{eur(val)}"))
+        left -= val
+    rows.append(("total", "You keep" if r["net"] > 0 else "You lose", 0, max(r["net"], 0) or abs(r["net"]), eur(r["net"]) if r["net"] > 0 else f"−{eur(-r['net'])}"))
+    st.markdown('<div class="k-wf">' + "".join(
+        f'<div class="k-wf-r {c}"><span>{n}</span><div class="tr"><i style="left:{lo / top * 100:.2f}%;width:{max(hi - lo, 0) / top * 100:.2f}%"></i></div><b>{t}</b></div>'
+        for c, n, lo, hi, t in rows) + "</div>", unsafe_allow_html=True)
+    st.caption("Each month: the staff time the AI frees, minus what it costs to run. The AI bill is the thin sliver.")
     st.markdown(f"#### The same {volume:,} {unit} on every model")
     kit.bars([{"label": x["model"], "value": x["cost"], "text": eur(x["cost"]), "pick": x is pick,
                "dim": not x["suited"], "note": None if x["suited"] else "may be too weak"} for x in r["rows"]])
